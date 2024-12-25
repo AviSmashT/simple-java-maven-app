@@ -74,18 +74,21 @@ jobs:
 
 
 
-    - name: Commit version change
-      run: |
-        git config user.name github-actions
-        git config user.email github-actions@github.com
-        git add pom.xml
-        git commit -m "Updated version"
-        git push
+    # - name: Commit version change
+    #   run: |
+    #     git config user.name github-actions
+    #     git config user.email github-actions@github.com
+    #     git add pom.xml
+    #     git commit -m "Updated version"
+    #     git push
 
 
 
 
-
+    - name: Commit & Push changes
+      uses: actions-js/push@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
 
 
 
