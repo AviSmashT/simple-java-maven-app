@@ -75,8 +75,10 @@ jobs:
 
     - name: Commit version change
       run: |
+        git config --global user.email "avishemtov2@gmail.com"
+        git config --global user.name "AviSmashT"
         git add pom.xml
-        git commit -m "Update version to ${{ github.event.inputs.newVersion }}"
+        git commit -m "Updated version"
         git push
 
 
