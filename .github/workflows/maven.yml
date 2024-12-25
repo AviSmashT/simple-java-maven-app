@@ -65,7 +65,7 @@ jobs:
 
 
     - name: Build with Maven
-      run: mvn -B clean package deploy build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion}-SNAPSHOT
+      run: mvn -B clean package build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion}-SNAPSHOT
 
     # - name: Build with Maven
     #   run: mvn -X -B build-helper:parse-version versions:set \
