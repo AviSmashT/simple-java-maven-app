@@ -75,8 +75,8 @@ jobs:
 
     - name: Commit version change
       run: |
-        git config --global user.email "avishemtov2@gmail.com"
-        git config --global user.name "AviSmashT"
+        git config user.name github-actions
+        git config user.email github-actions@github.com
         git add pom.xml
         git commit -m "Updated version"
         git push
