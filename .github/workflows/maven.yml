@@ -70,8 +70,8 @@ jobs:
         mvn build-helper:parse-version
         echo "VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
 
-
-
+    - name: Build 1
+      run: mvn -B clean package
 
     - name: Build with Maven
       run: mvn -B clean build-helper:parse-version versions:set \
