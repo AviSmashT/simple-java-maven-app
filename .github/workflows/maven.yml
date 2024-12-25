@@ -74,11 +74,13 @@ jobs:
 
 
     - name: Build with Maven
-      run: mvn -X -B build-helper:parse-version versions:set \
+      run: mvn -B clean build-helper:parse-version versions:set \
            -DnewVersion=1.0.1-SNAPSHOT versions:commit
 
 
-
+    # - name: Build with Maven
+    #   run: mvn -X -B build-helper:parse-version versions:set \
+    #        -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion}-SNAPSHOT versions:commit
 
 
 
