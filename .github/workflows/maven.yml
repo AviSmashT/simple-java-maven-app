@@ -1,0 +1,75 @@
+# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
+
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: Java CI with Maven
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        maven: [ '3.9.2' ]
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # - name: Version Increment
+    #   uses: reecetech/version-increment@2024.10.1      
+    #   id: version
+    #   with:
+    #     scheme: semver
+    #     increment: patch
+    #     base_version: "1.0.0"
+        
+    # - name: Set new version in pom.xml
+    #   run: |
+    #       NEW_VERSION=${{ steps.version.outputs.version }}
+    #       echo "Setting version to $NEW_VERSION"
+    #       mvn versions:set -DnewVersion=$NEW_VERSION -DgenerateBackupPoms=false
+
+    - name: Set up JDK 17
+      uses: s4u/setup-maven-action@v1.17.0
+      with:
+        java-version: 17
+        maven-version: ${{ matrix.maven }}
+    # - name: Bump version
+    #   id: bump
+    #   uses: mickem/gh-action-bump-maven-version@v1.0.0
+    #   with:
+    #     bump-command: mvn org.codehaus.mojo:versions-maven-plugin:2.7:set-property -Dproperty=revision -DnewVersion=@NEW_VERSION@
+
+
+    - name: Build with Maven
+      run: mvn -X -B build-helper:parse-version versions:set \
+           -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion}-SNAPSHOT versions:commit
+
+    # - name: Print if version changed
+    #   if: steps.increment-version.outputs.previous-version != steps.increment-version.outputs.new-version
+    #   run: echo "The new version is now $new_version"
+    #   env:
+    #     new_version: ${{ steps.increment-version.outputs.new-version }}
+    
+    
+    
+    # - name: Increment Patch Version
+    #   run: mvn clean install build-helper:parse-version versions:set \
+    #           - DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.nextMinorVersion}.0 versions:commit
+
+
+    # - name: Build with Maven
+    #   run: mvn -B package -DbaseVersion${{ steps.version.outputs.version }} --file pom.xml
+
+    # # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
+    # - name: Update dependency graph
+    #   uses: advanced-security/maven-dependency-submission-action@571e99aab1055c2e71a1e2309b9691de18d6b7d6
