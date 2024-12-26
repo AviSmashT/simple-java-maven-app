@@ -96,11 +96,37 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: eu-central-1
     - name: Initialise project and deploy terraform
-      run: |
-        cd terraform
-        terraform fmt
-        terraform init
-        terraform apply --auto-approve=true
+      uses: hashicorp/setup-terraform@v3
+      
+    - name: Terraform fmt
+      id: fmt
+      run: terraform fmt -check
+      continue-on-error: true
+    
+    - name: Terraform Init
+      id: init
+      run: terraform init
+    
+    - name: Terraform Validate
+      id: validate
+      run: terraform validate -no-color
+    
+    - name: Terraform Plan
+      id: plan
+      run: terraform plan -no-color
+      continue-on-error: true
+
+    - name: Terraform Apply
+      id: apply
+      run: terraform apply --auto-approve=true
+
+
+      
+      # run: |
+      #   cd terraform
+      #   terraform fmt
+      #   terraform init
+      #   terraform apply --auto-approve=true
 
 
     # # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
