@@ -113,12 +113,12 @@ jobs:
     
     - name: Terraform Plan
       id: plan
-      run: terraform plan -no-color
+      run: terraform plan ./terraform/main.tf
       continue-on-error: true
 
     - name: Terraform Apply
       id: apply
-      run: terraform apply --auto-approve=true
+      run: terraform apply ./terraform/main.tf --auto-approve=true
 
 
       
