@@ -20,4 +20,4 @@ COPY --from=base /home/workspace/target/*.jar /home/workspace/target/program.jar
 
 
 # Run the application:
-CMD ["java", "-cp", "/home/workspace/target/program.jar"]
+CMD ["java", "-jar", "/home/workspace/target/program.jar"]
