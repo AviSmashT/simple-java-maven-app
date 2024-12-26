@@ -23,26 +23,23 @@ resource "aws_instance" "deployment-maven-actions" {
     user_data = <<-EOF
     #!/bin/bash
     
-    # Install docker:
-    sudo yum update -y
-    sudo yum install -y docker
+    # Add Docker's official GPG key:
+    sudo apt-get update
+    sudo apt-get install ca-certificates curl
+    sudo install -m 0755 -d /etc/apt/keyrings
+    sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+    sudo chmod a+r /etc/apt/keyrings/docker.asc
+    
+    # Add the repository to Apt sources:
+    echo \
+      "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+      $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+      sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    sudo apt-get update
 
     # Start docker service and add ubuntu to the docker group:
     sudo service docker start
     sudo usermod -a -G docker ubuntu
-
-    # Set the docker config directory:
-    sudo mkdir -p ~/.docker/cli-plugins
-    # Download the compose plugin to the config directory:
-    sudo curl -SL https://github.com/docker/compose/releases/download/v2.30.3/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
-    sudo mkdir -p /usr/local/lib/docker/cli-plugins
-    sudo cp ~/.docker/cli-plugins /usr/local/lib/docker/cli-plugins
-
-
-    # for current user:
-    sudo chmod +x ~/.docker/cli-plugins/docker-compose
-    # for all users:
-    sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose 
     	
    	docker pull avishemtov2/maven-actions:latest 
    	docker run -d avishemtov2/maven-actions:latest
