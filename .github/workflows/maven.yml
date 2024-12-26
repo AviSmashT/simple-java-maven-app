@@ -105,20 +105,20 @@ jobs:
     
     - name: Terraform Init
       id: init
-      run: terraform init
+      run: terraform -chdir=./terraform init
     
     - name: Terraform Validate
       id: validate
-      run: terraform validate -no-color
+      run: terraform -chdir=./terraform validate
     
     - name: Terraform Plan
       id: plan
-      run: terraform plan ./terraform/main.tf
+      run: terraform -chdir=./terraform plan
       continue-on-error: true
 
     - name: Terraform Apply
       id: apply
-      run: terraform apply ./terraform/main.tf --auto-approve=true
+      run: terraform -chdir=./terraform apply --auto-approve=true
 
 
       
