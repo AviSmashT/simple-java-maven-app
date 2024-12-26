@@ -1,4 +1,4 @@
-FROM maven:3.9.0-eclipse-temurin-19 AS base
+FROM 3.9.9-amazoncorretto-8-debian AS base
 
 
 WORKDIR /home/workspace
