@@ -1,4 +1,4 @@
-FROM 3.9.9-amazoncorretto-8-debian AS base
+FROM 3.9.8-eclipse-temurin-8-focal AS base
 
 
 WORKDIR /home/workspace
