@@ -15,6 +15,18 @@ on:
     branches: [ "master" ]
 permissions:
     contents: write
+
+
+
+env:
+  # Use docker.io for Docker Hub if empty
+  REGISTRY: docker.io
+  # github.repository as <account>/<repo>
+  IMAGE_NAME: ${{ github.repository }}
+
+
+
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -25,26 +37,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    # - name: Version Increment
-    #   uses: reecetech/version-increment@2024.10.1      
-    #   id: version
-    #   with:
-    #     scheme: semver
-    #     increment: patch
-    #     base_version: "1.0.0"
-        
-    # - name: Set new version in pom.xml
-    #   run: |
-    #       NEW_VERSION=${{ steps.version.outputs.version }}
-    #       echo "Setting version to $NEW_VERSION"
-    #       mvn versions:set -DnewVersion=$NEW_VERSION -DgenerateBackupPoms=false
-
-
-
-
-
-
-
+    
 
 
     - name: Set up JDK 17
@@ -52,29 +45,13 @@ jobs:
       with:
         java-version: 17
         maven-version: ${{ matrix.maven }}
-    # - name: Bump version
-    #   id: bump
-    #   uses: mickem/gh-action-bump-maven-version@v1.0.0
-    #   with:
-    #     bump-command: mvn org.codehaus.mojo:versions-maven-plugin:2.7:set-property -Dproperty=revision -DnewVersion=@NEW_VERSION@
-
-
-
-    # - name: Build with Maven
-    #   run: mvn -B clean package build-helper:parse-version versions:set \
-    #        -DnewVersion=1.0.1-SNAPSHOT versions:commit
+    
 
 
     - name: Build with Maven
       run: mvn -B clean package build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion}-SNAPSHOT versions:commit
-    # - name: Build with Maven
-    #   run: mvn -X -B build-helper:parse-version versions:set \
-    #        -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion}-SNAPSHOT versions:commit
 
-
-
-
-    - name: Commit version change
+    - name: Commit new version
       run: |
         git config user.name AviSmashT
         git config user.email AviSmashT@github.com
@@ -90,21 +67,47 @@ jobs:
 
 
 
-    # - name: Print if version changed
-    #   if: steps.increment-version.outputs.previous-version != steps.increment-version.outputs.new-version
-    #   run: echo "The new version is now $new_version"
-    #   env:
-    #     new_version: ${{ steps.increment-version.outputs.new-version }}
-    
-    
-    
-    # - name: Increment Patch Version
-    #   run: mvn clean install build-helper:parse-version versions:set \
-    #           - DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.nextMinorVersion}.0 versions:commit
 
 
-    # - name: Build with Maven
-    #   run: mvn -B package -DbaseVersion${{ steps.version.outputs.version }} --file pom.xml
+
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+
+      - name: Build and push Docker image
+        id: push
+        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+        with:
+          context: .
+          file: ./docker/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true
+
+
+
+
+
+    
+    
+    
+    
 
     # # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     # - name: Update dependency graph
