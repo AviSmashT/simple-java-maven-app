@@ -27,9 +27,9 @@ resource "aws_instance" "deployment-maven-actions" {
     sudo yum update -y
     sudo yum install -y docker
 
-    # Start docker service and add ec2-user to the docker group:
+    # Start docker service and add ubuntu to the docker group:
     sudo service docker start
-    sudo usermod -a -G docker ec2-user
+    sudo usermod -a -G docker ubuntu
 
     # Set the docker config directory:
     sudo mkdir -p ~/.docker/cli-plugins
@@ -43,10 +43,7 @@ resource "aws_instance" "deployment-maven-actions" {
     sudo chmod +x ~/.docker/cli-plugins/docker-compose
     # for all users:
     sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose 
- 
-      
-   	#docker login -u avishemtov2 -p ${var.docker_password}
-   	
+    	
    	docker pull avishemtov2/maven-actions:latest 
    	docker run -d avishemtov2/maven-actions:latest
   EOF
