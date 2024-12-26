@@ -12,7 +12,7 @@ RUN mvn clean compile package
 
 
 # Use multistage to create image with the files necessary only
-FROM ibmjava:jre
+FROM openjdk:25-slim-bullseye
 
 
 # Copy the packaged java application:
