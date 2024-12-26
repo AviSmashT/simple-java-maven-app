@@ -1,4 +1,4 @@
-FROM maven:3.9.8-openjdk-18-slim AS base
+FROM maven:3.9.9-openjdk-18-slim AS base
 
 
 WORKDIR /home/workspace
