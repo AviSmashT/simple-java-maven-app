@@ -1,10 +1,4 @@
-# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
-
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
+# This workflow will build a Java project with Maven and deploy to EC2 instance in aws
 
 name: Java CI with Maven
 
@@ -17,12 +11,10 @@ permissions:
     contents: write
 
 env:
-  # Use docker.io for Docker Hub if empty
+  # Use docker.io for DockerHub
   REGISTRY: docker.io
-  # github.repository as <account>/<repo>
+  # DockerHub repository/image
   IMAGE_NAME: avishemtov2/maven-actions
-  #IMAGE_NAME: ${{ github.repository }}
-
 
 jobs:
   build:
@@ -34,19 +26,15 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    
-
-
     - name: Set up JDK 17
       uses: s4u/setup-maven-action@v1.17.0
       with:
         java-version: 17
         maven-version: ${{ matrix.maven }}
     
+    - name: Update project version
+      run: mvn -B build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion}-SNAPSHOT versions:commit
 
-
-    - name: Build with Maven
-      run: mvn -B clean package build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion}-SNAPSHOT versions:commit
 
     - name: Commit new version
       run: |
@@ -58,11 +46,14 @@ jobs:
         git push 
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: Log in to Docker Hub
+
+
+    - name: Login to DockerHub
       uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
 
     - name: Extract metadata (tags, labels) for Docker
       id: meta
@@ -70,7 +61,17 @@ jobs:
       with:
         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
-    - name: Build and push Docker image
+
+    - name: Get project version
+      id: get-version
+      run: |
+        VERSION=$(mvn -B build-helper:parse-version exec:exec \
+          -Dexec.executable="echo" \
+          -Dexec.args='${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}')
+        echo "version=$VERSION" >> $GITHUB_ENV
+
+
+    - name: Build and push Docker image to DockerHub
       id: push
       uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
       with:
@@ -78,16 +79,12 @@ jobs:
         file: ./docker/Dockerfile
         push: true
         tags: ${{ env.IMAGE_NAME }}:latest
-        # tags: ${{ steps.meta.outputs.tags }}
+        # Output the matadata from previous steps
         labels: ${{ steps.meta.outputs.labels }}
-
-    # - name: Generate artifact attestation
-    #   uses: actions/attest-build-provenance@v2
-    #   with:
-    #     subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
-    #     subject-digest: ${{ steps.push.outputs.digest }}
-    #     push-to-registry: true
-
+        build-args: CUR_VERSION=${{ env.version }}
+      # env:
+      #   CUR_VERSION: ${{ env.version }}
+        
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
@@ -119,16 +116,3 @@ jobs:
     - name: Terraform Apply
       id: apply
       run: terraform -chdir=./terraform apply --auto-approve=true
-
-
-      
-      # run: |
-      #   cd terraform
-      #   terraform fmt
-      #   terraform init
-      #   terraform apply --auto-approve=true
-
-
-    # # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
-    # - name: Update dependency graph
-    #   uses: advanced-security/maven-dependency-submission-action@571e99aab1055c2e71a1e2309b9691de18d6b7d6
