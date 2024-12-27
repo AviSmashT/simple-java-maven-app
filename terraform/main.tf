@@ -36,7 +36,9 @@ resource "aws_instance" "deployment-maven-actions" {
       $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
       sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
     sudo apt-get update -y
-    
+
+    sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
     # Start docker service and add ubuntu to the docker group:
     sudo service docker start
     sudo usermod -a -G docker ubuntu
