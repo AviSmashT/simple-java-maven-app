@@ -14,10 +14,12 @@ RUN mvn install
 # Use multistage to create image with the files necessary only
 FROM openjdk:25-slim
 
+# Define current version argument
+ARG CUR_VERSION
 
 # Copy the packaged java application:
-COPY --from=base /home/workspace/target/*.jar /home/workspace/target/program.jar
+COPY --from=base /home/workspace/target/${CUR_VERSION}.jar /home/workspace/target/${CUR_VERSION}.jar
 
 
 # Run the application:
-CMD ["java", "-jar", "/home/workspace/target/program.jar"]
+CMD ["java", "-jar", "/home/workspace/target/${CUR_VERSION}.jar"]
