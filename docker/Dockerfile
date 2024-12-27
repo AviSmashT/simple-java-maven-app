@@ -4,11 +4,11 @@ FROM maven:3.9.9-eclipse-temurin-17-focal AS base
 WORKDIR /home/workspace
 
 # Copy all project files to the contaner:
-COPY . .
-
+COPY pom.xml .
+COPY src ./src
 
 # Compile and package the application:
-RUN mvn clean compile package
+RUN mvn install
 
 
 # Use multistage to create image with the files necessary only
