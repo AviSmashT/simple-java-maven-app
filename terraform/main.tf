@@ -42,7 +42,9 @@ resource "aws_instance" "deployment-maven-actions" {
     # Start docker service and add ubuntu to the docker group:
     sudo service docker start
     sudo usermod -a -G docker ubuntu
-        	
+    
+    newgrp docker
+
     docker pull avishemtov2/maven-actions:latest 
     docker run -d avishemtov2/maven-actions:latest
   EOF
