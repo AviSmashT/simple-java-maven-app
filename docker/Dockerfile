@@ -23,4 +23,4 @@ COPY --from=base /home/workspace/target/my-app-${CURRENT_VERSION}.jar /home/work
 
 
 # Run the application:
-CMD ["java", "-jar", "/home/workspace/target/my-app-${CURRENT_VERSION}.jar"]
+CMD ["java", "-jar", "echo /home/workspace/target/my-app-${CURRENT_VERSION}.jar"]
