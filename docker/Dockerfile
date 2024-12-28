@@ -18,7 +18,7 @@ FROM openjdk:25-slim
 ARG CUR_VERSION
 
 # Copy the packaged java application:
-COPY --from=base /home/workspace/target/${CUR_VERSION}.jar /home/workspace/target/${CUR_VERSION}.jar
+COPY --from=base /home/workspace/target/my-app-${CUR_VERSION}.jar /home/workspace/target/my-app-${CUR_VERSION}.jar
 
 
 # Run the application:
