@@ -82,37 +82,37 @@ jobs:
         # Output the matadata from previous steps
         labels: ${{ steps.meta.outputs.labels }}
         build-args: CUR_VERSION=${{ env.version }}
-      # env:
-      #   CUR_VERSION: ${{ env.version }}
+      env:
+        CUR_VERSION: ${{ env.version }}
         
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: eu-central-1
-    - name: Initialise project and deploy terraform
-      uses: hashicorp/setup-terraform@v3
+    # - name: Configure AWS credentials
+    #   uses: aws-actions/configure-aws-credentials@v4
+    #   with:
+    #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    #     aws-region: eu-central-1
+    # - name: Initialise project and deploy terraform
+    #   uses: hashicorp/setup-terraform@v3
       
-    - name: Terraform fmt
-      id: fmt
-      run: terraform fmt -check
-      continue-on-error: true
+    # - name: Terraform fmt
+    #   id: fmt
+    #   run: terraform fmt -check
+    #   continue-on-error: true
     
-    - name: Terraform Init
-      id: init
-      run: terraform -chdir=./terraform init
+    # - name: Terraform Init
+    #   id: init
+    #   run: terraform -chdir=./terraform init
     
-    - name: Terraform Validate
-      id: validate
-      run: terraform -chdir=./terraform validate
+    # - name: Terraform Validate
+    #   id: validate
+    #   run: terraform -chdir=./terraform validate
     
-    - name: Terraform Plan
-      id: plan
-      run: terraform -chdir=./terraform plan
-      continue-on-error: true
+    # - name: Terraform Plan
+    #   id: plan
+    #   run: terraform -chdir=./terraform plan
+    #   continue-on-error: true
 
-    - name: Terraform Apply
-      id: apply
-      run: terraform -chdir=./terraform apply --auto-approve=true
+    # - name: Terraform Apply
+    #   id: apply
+    #   run: terraform -chdir=./terraform apply --auto-approve=true
