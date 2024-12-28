@@ -15,7 +15,8 @@ RUN mvn install
 FROM openjdk:25-slim
 
 # Define current version argument
-ARG CUR_VERSION
+ARG CUR_VER
+ENV CUR_VERSION=$CUR_VER
 
 # Copy the packaged java application:
 COPY --from=base /home/workspace/target/my-app-${CUR_VERSION}.jar /home/workspace/target/my-app-${CUR_VERSION}.jar
