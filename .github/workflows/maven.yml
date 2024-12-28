@@ -70,6 +70,16 @@ jobs:
     #       -Dexec.args='${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}')
     #     echo "version=$VERSION" >> $GITHUB_ENV
 
+    - name: Get project version
+      id: get-version
+      run: |
+        VERSION=$(mvn -q \
+          -Dexec.executable="echo" \
+          -Dexec.args='${project.version}' \
+          --non-recursive \
+          org.codehaus.mojo:exec-maven-plugin:1.6.0:exec)
+        echo "version=$VERSION" >> $GITHUB_ENV
+
 
     - name: Build and push Docker image to DockerHub
       id: push
@@ -81,7 +91,7 @@ jobs:
         tags: ${{ env.IMAGE_NAME }}:latest
         # Output the matadata from previous steps
         labels: ${{ steps.meta.outputs.labels }}
-        build-args: CUR_VERSION=${{ mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec }}
+        build-args: CUR_VERSION=${{ env.version }}
       # env:
       #   CUR_VERSION: ${{ env.version }}
         
